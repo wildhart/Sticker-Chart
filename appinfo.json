@@ -1,22 +1,50 @@
 {
     "appKeys": {
-        "KEY_ALARM": 2,
-        "KEY_APP_VERSION": 5,
+        "KEY_APP_VERSION": 1,
+        "KEY_CHILDREN": 100,
         "KEY_CONFIG_DATA": 0,
-        "KEY_EXPORT": 6,
-        "KEY_MEDICATIONS": 100,
-        "KEY_MODE": 1,
-        "KEY_SORT": 3,
-        "KEY_VERSION": 4
+        "KEY_EXPORT": 3,
+        "KEY_TIMESTAMP": 4,
+        "KEY_VERSION": 2
     },
     "capabilities": [
         "configurable"
     ],
     "companyName": "cmorison@gmail.com",
-    "longName": "Medication Timer",
+    "longName": "Sticker Chart",
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "file": "images/emoji_1_c.png",
+                "name": "IMAGE_EMOJI_C1",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/emoji_2_c.png",
+                "name": "IMAGE_EMOJI_C2",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/emoji_5_c.png",
+                "name": "IMAGE_EMOJI_C5",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/emoji_4_c.png",
+                "name": "IMAGE_EMOJI_C4",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/emoji_3_c.png",
+                "name": "IMAGE_EMOJI_C3",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
             {
                 "file": "images/menu_icon.png",
                 "menuIcon": true,
@@ -30,11 +58,14 @@
             }
         ]
     },
-    "sdkVersion": "2",
-    "shortName": "Meds Timer",
-    "uuid": "95d07e1a-2451-4ffa-aa44-836e523a7648",
-    "versionCode": 1,
-    "versionLabel": "1.2",
+    "sdkVersion": "3",
+    "shortName": "Sticker Chart",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "feafaa6c-dfbd-4e0a-a6ca-bf17bd77ed59",
+    "versionLabel": "1.0",
     "watchapp": {
         "watchface": false
     }

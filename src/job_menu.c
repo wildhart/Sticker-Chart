@@ -4,13 +4,13 @@ uint8_t job_index;
 bool job_changed;
 
 // BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
-static Window *s_window;
+static Window *s_window=NULL;
 static MenuLayer *s_menulayer;
 
 static void initialise_ui(void) {
   s_window = window_create();
   #ifndef PBL_SDK_3
-    window_set_fullscreen(s_window, false);
+    window_set_fullscreen(s_window, true);
   #endif
   
   // s_menulayer
@@ -31,11 +31,8 @@ static void destroy_ui(void) {
 
 enum { // main menu structure
   MENU_JOB,
-  MENU_ADD10,
-  MENU_SUB10,
-  MENU_RESET,
   MENU_RENAME,
-  MENU_ADJUST,
+  MENU_SUB,
   MENU_DELETE,
   
   NUM_MENU_ROWS
@@ -46,57 +43,28 @@ static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t secti
 }
 
 static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-  return (cell_index->row == MENU_JOB) ? MENU_HEIGHT_DOUBLE : MENU_HEIGHT_SINGLE;
+  return (cell_index->row == MENU_JOB) ? MENU_HEIGHT_JOB : MENU_HEIGHT_SINGLE;
 }
 
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   switch (cell_index->row) {
     case MENU_JOB: menu_cell_draw_job(ctx, cell_layer, job_index); break;
-    case MENU_RESET: menu_cell_draw_other(ctx, cell_layer, "Reset Timer", NULL, bitmap_reset); break;
-    case MENU_ADD10: menu_cell_draw_other(ctx, cell_layer, "Add 10 Minutes", NULL, bitmap_add); break;
-    case MENU_SUB10: menu_cell_draw_other(ctx, cell_layer, "Sub 10 Minutes", NULL, bitmap_minus); break;
     case MENU_RENAME: menu_cell_draw_other(ctx, cell_layer, "Rename", NULL, bitmap_edit); break;
-    case MENU_ADJUST: menu_cell_draw_other(ctx, cell_layer, "Set Repeat", NULL, bitmap_adjust); break;
-    case MENU_DELETE: menu_cell_draw_other(ctx, cell_layer, "Delete", NULL, bitmap_delete); break;
+    case MENU_SUB: menu_cell_draw_other(ctx, cell_layer, "Remove sticker", NULL, bitmap_minus); break;
+    case MENU_DELETE: menu_cell_draw_other(ctx, cell_layer, "Delete child", NULL, bitmap_delete); break;
   }
 }
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   switch (cell_index->row) {
-    case MENU_RESET: 
-      jobs_reset_and_save(&job_index);
-      job_menu_hide();
-      break;
-    case MENU_ADD10:
-      jobs_add_minutes(&job_index, (settings.Mode==MODE_NEXT_TIME) ? 10:-10); // this updates job_index incase it gets sorted
-      job_changed=true;
-      menu_layer_reload_data(s_menulayer);
-      break;
-    case MENU_SUB10:
-      jobs_add_minutes(&job_index, (settings.Mode==MODE_NEXT_TIME) ? -10:10); // this updates job_index incase it gets sorted
-      job_changed=true;
-      menu_layer_reload_data(s_menulayer);
-      break;
+    case MENU_JOB: emoji_menu_show(cell_index->row); break;
     case MENU_RENAME: jobs_rename_job(job_index); break;
-    case MENU_ADJUST: job_adjust_show(); break;
+    case MENU_SUB:
+      if (jobs_delete_sticker(job_index)) layer_mark_dirty((Layer*) menu_layer);
+      break;
     case MENU_DELETE: 
       jobs_delete_job_and_save(job_index);
       job_menu_hide();
-      break;
-  }
-}
-
-static void menu_select_long_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-  switch (cell_index->row) {
-    case MENU_ADD10:
-      jobs_add_minutes(&job_index, (settings.Mode==MODE_NEXT_TIME) ? 1:-1); // this updates job_index incase it gets sorted
-      job_changed=true;
-      menu_layer_reload_data(s_menulayer);
-      break;
-    case MENU_SUB10:
-      jobs_add_minutes(&job_index, (settings.Mode==MODE_NEXT_TIME) ? -1:1); // this updates job_index incase it gets sorted
-      job_changed=true;
-      menu_layer_reload_data(s_menulayer);
       break;
   }
 }
@@ -129,7 +97,7 @@ void job_menu_show(uint8_t index) {
     .draw_header = NULL, //menu_draw_header_callback,
     .draw_row = menu_draw_row_callback,
     .select_click = menu_select_callback,
-    .select_long_click = menu_select_long_callback
+    .select_long_click = NULL //menu_select_long_callback
   });
   window_stack_push(s_window, true);
 }
@@ -140,4 +108,8 @@ void job_menu_hide(void) {
 
 void job_menu_update(void) {
   if (s_window) menu_layer_reload_data(s_menulayer);
+}
+
+bool job_menu_visible(void) {
+  return s_window && window_is_loaded(s_window);
 }

@@ -4,11 +4,11 @@
 #include "jobs.h"
 #include "main_menu.h"
 #include "job_menu.h"
-#include "job_adjust.h"
-#include "update.h"
+#include "emoji_menu.h"
+#include "treat_window.h"
 #include "tertiary_text.h"
 
-#define DISABLE_LOGGING true
+#define DISABLE_LOGGING false
 
 #if DISABLE_LOGGING
 #define LOG(...)
@@ -22,14 +22,12 @@
 #define INFO(...) app_log(APP_LOG_LEVEL_INFO, __FILE__, __LINE__, __VA_ARGS__)
 #define WARN(...) app_log(APP_LOG_LEVEL_WARNING, __FILE__, __LINE__, __VA_ARGS__)
 #define ERROR(...) app_log(APP_LOG_LEVEL_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+#define HEAP(text) APP_LOG(APP_LOG_LEVEL_INFO, "heap: %d, used: %d, free: %d, %s %s",  heap_bytes_used()+heap_bytes_free(), heap_bytes_used(), heap_bytes_free(), __func__, text)
 #endif
+
 
 #define ANIMATED true
 #define HIDDEN true
-
-#define MENU_SECTION_CELL  (cell_index->section * 100 + cell_index->row)
-#define MENU_HEIGHT_SINGLE 28
-#define MENU_HEIGHT_DOUBLE 42
 
 #define END_TIME(JOB) ((time_t) (JOB)->Seconds + (time_t) (JOB)->Repeat_hrs*3600)
 
@@ -60,38 +58,42 @@
 
 extern GBitmap *bitmap_matrix;
 //extern GBitmap *bitmap_pause;
-extern GBitmap *bitmap_play;
+//extern GBitmap *bitmap_play;
 extern GBitmap *bitmap_add;
 extern GBitmap *bitmap_settings;
 extern GBitmap *bitmap_delete;
 extern GBitmap *bitmap_edit;
-extern GBitmap *bitmap_adjust;
-extern GBitmap *bitmap_reset;
+//extern GBitmap *bitmap_adjust;
+//extern GBitmap *bitmap_reset;
 extern GBitmap *bitmap_minus;
-extern GBitmap *bitmap_tick;
+//extern GBitmap *bitmap_tick;
+
+#define MAX_EMOJI_PAGES 5
+#define EMOJI_PAGE_COLS 5
+#define EMOJI_PAGE_ROWS 4
+#define EMOJI_PAGE_EMOJIS (EMOJI_PAGE_COLS*EMOJI_PAGE_ROWS)
+#define EMOJI_WIDTH 28
+#define EMOJI_HEIGHT 33
+
+#define EMOJI_PAGE_WIDTH (EMOJI_WIDTH*EMOJI_PAGE_COLS)
+#define EMOJI_PAGE_HEIGHT (EMOJI_HEIGHT*EMOJI_PAGE_ROWS)
+
+#define MENU_SECTION_CELL  (cell_index->section * 100 + cell_index->row)
+#define MENU_HEIGHT_SINGLE 28
+#define MENU_HEIGHT_DOUBLE 42
+#define MENU_HEIGHT_JOB    20+EMOJI_HEIGHT+4
 
 // Persistent Storage Keys
-#define STORAGE_KEY_VERSION    1
-#define STORAGE_KEY_SETTINGS   2
-#define STORAGE_KEY_FIRST_MED  100
+#define STORAGE_KEY_VERSION      1
+#define STORAGE_KEY_TIMESTAMP    1
+#define STORAGE_KEY_FIRST_CHILD  100
 
-#define CURRENT_STORAGE_VERSION 3
-//changes in storage version: 2 added bool Fixed to end of every Job struct
-//changes in storage version: 3 configuration
+#define CURRENT_STORAGE_VERSION 1
 
-typedef struct {
-  uint8_t Mode;
-  bool Alarm;
-  bool Sort;
-} Settings;
-
-extern Settings settings;
 extern bool export_after_save;
 
-enum {
-  MODE_COUNT_UP,
-  MODE_COUNT_DOWN,
-  MODE_NEXT_TIME
-};
+#define FIRST_ASCII 32
 
+#define EMOJI_INDEX(I) (main_get_emoji((I)/EMOJI_PAGE_EMOJIS, (I)%EMOJI_PAGE_COLS, ((I)%EMOJI_PAGE_EMOJIS)/EMOJI_PAGE_COLS))
+GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y);
 void main_save_data(void);
