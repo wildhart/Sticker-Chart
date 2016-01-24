@@ -77,7 +77,7 @@ static void handle_window_unload(Window* window) {
   destroy_ui();
   s_window=NULL;
   if (job_changed) {
-    main_save_data();
+    main_save_data(0);
   }
 }
 

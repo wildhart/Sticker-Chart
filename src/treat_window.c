@@ -1,6 +1,7 @@
 #include "main.h"
 
-static char child_name[JOB_NAME_LENGTH+4];
+#define JOB_NAME_EXCLAIMED_LENGTH JOB_NAME_SIZE+4
+static char child_name_exclaimed[JOB_NAME_EXCLAIMED_LENGTH]; // include space for " !!!"
 
 // BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
 static Window *s_window;
@@ -27,7 +28,7 @@ static void initialise_ui(void) {
   
   // s_textlayer_name
   s_textlayer_name = text_layer_create(GRect(0, 30, 144, 30));
-  text_layer_set_text(s_textlayer_name, child_name);
+  text_layer_set_text(s_textlayer_name, child_name_exclaimed);
   text_layer_set_text_alignment(s_textlayer_name, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_name, s_res_gothic_28_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_name);
@@ -72,7 +73,7 @@ static void click_config_provider(void) {
 }
 
 void treat_window_show(char *name) {
-  snprintf(child_name,JOB_NAME_LENGTH+4,"%s!!!",name);
+  snprintf(child_name_exclaimed,JOB_NAME_EXCLAIMED_LENGTH,"%s!!!",name);
   initialise_ui();
   window_set_window_handlers(s_window, (WindowHandlers) {
     .unload = handle_window_unload,

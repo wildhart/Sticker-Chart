@@ -61,7 +61,6 @@
     "sdkVersion": "3",
     "shortName": "Sticker Chart",
     "targetPlatforms": [
-        "aplite",
         "basalt"
     ],
     "uuid": "feafaa6c-dfbd-4e0a-a6ca-bf17bd77ed59",

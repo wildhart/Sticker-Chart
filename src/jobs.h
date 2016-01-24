@@ -1,6 +1,6 @@
 #pragma once
 
-#define JOB_NAME_LENGTH 24
+#define JOB_NAME_SIZE 15 
 #define MAX_STICKERS 20
 
 extern uint8_t jobs_count;

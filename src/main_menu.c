@@ -79,18 +79,14 @@ void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t in
 
   uint8_t cell = bounds.size.w / 5;
   uint8_t marg = (cell - EMOJI_WIDTH)/2+1;
-  char* stickers=jobs_get_job_stickers(index);
+  char* stickers=jobs_get_job_stickers(index); // always returns a zero padded string
   if (*stickers) {
-    uint8_t s = 0;
-    while (*(stickers+s)) s++;
-    uint8_t emoji;
-    s--;
-    s -= s % EMOJI_PAGE_COLS;
-    stickers+=s;
-    for (uint8_t i=0; i<5 && *stickers; i++) {
-      emoji = *stickers - FIRST_ASCII;
+    while (*(stickers+5)) stickers+=5;
+    uint8_t i=0;
+    while (*stickers) {
+      uint8_t emoji=*stickers-1;
+      graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji), GRect(marg+cell*(i++),23, EMOJI_WIDTH, EMOJI_HEIGHT));
       stickers++;
-      graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji), GRect(marg+cell*i,23, EMOJI_WIDTH, EMOJI_HEIGHT));
     }
   } else {
     graphics_draw_text(ctx, "PRESS to add sticker", FONT_GOTHIC_14, GRect(4, 20, bounds.size.w-8, 16), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -145,7 +141,7 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
         case MENU_SETTINGS_ADD: jobs_add_job(); break;
         case MENU_SETTINGS_CONFIG:
           export_after_save=true;
-          main_save_data();
+          main_save_data(1);
           break;
       }
   }

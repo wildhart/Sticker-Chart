@@ -92,8 +92,6 @@ extern GBitmap *bitmap_minus;
 
 extern bool export_after_save;
 
-#define FIRST_ASCII 32
-
 #define EMOJI_INDEX(I) (main_get_emoji((I)/EMOJI_PAGE_EMOJIS, (I)%EMOJI_PAGE_COLS, ((I)%EMOJI_PAGE_EMOJIS)/EMOJI_PAGE_COLS))
 GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y);
-void main_save_data(void);
+void main_save_data(const uint32_t timestamp);

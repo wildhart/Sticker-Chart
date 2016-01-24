@@ -55,7 +55,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
     uint8_t emoji;
     uint8_t i=0;
     while (*stickers) {
-      emoji = *stickers - FIRST_ASCII;
+      emoji = *stickers-1;
       graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji), GRect(ox+w*(i%EMOJI_PAGE_COLS), oy+h*(i/EMOJI_PAGE_COLS), EMOJI_WIDTH, EMOJI_HEIGHT));
       stickers++;
       i++;
@@ -169,7 +169,7 @@ static void handle_window_unload(Window* window) {
 
 void emoji_menu_show(uint8_t index) {
   child_index=index;
-  page_selected=jobs_get_job_count(index)>EMOJI_PAGE_COLS ? PAGE_CHILD : PAGE_TABS;
+  page_selected=PAGE_CHILD;
   tab_selected=emoji_selected=0;
   initialise_ui();
   window_set_window_handlers(s_window, (WindowHandlers) {

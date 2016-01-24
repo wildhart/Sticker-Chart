@@ -1,9 +1,10 @@
 #include "main.h"
 
+#define STICKERS_SIZE MAX_STICKERS+1
 typedef struct {
-  char Name[JOB_NAME_LENGTH];
+  char Name[JOB_NAME_SIZE];
   uint16_t Count;
-  char Stickers[MAX_STICKERS];
+  char Stickers[STICKERS_SIZE];
 } Job;
 
 typedef struct Job_ptr {
@@ -18,18 +19,24 @@ uint8_t jobs_count=0;
 // JOB LIST FUNCTIONS
 // *****************************************************************************************************
 
+Job* jobs_list_get_index(uint8_t index) {
+  if (index>=jobs_count) return NULL;
+  Job_ptr* job_ptr = first_job_ptr;
+  while (index--) job_ptr=job_ptr->Next_ptr;
+  return job_ptr->Job;
+}
+
 static void jobs_list_append_job(const char* name, uint16_t count, char* stickers) {
   Job* new_job = malloc(sizeof(Job));
   Job_ptr* new_job_ptr = malloc(sizeof(Job_ptr));
   
   new_job_ptr->Job = new_job;
   new_job_ptr->Next_ptr = NULL;
-  strncpy(new_job->Name, name, JOB_NAME_LENGTH);
-  new_job->Name[JOB_NAME_LENGTH-1]=0;
+  
+  strncpy(new_job->Name, name, JOB_NAME_SIZE)[JOB_NAME_SIZE-1]=0;
   new_job->Count = count;
-  for (uint8_t i=0; i<MAX_STICKERS; i++) new_job->Stickers[i]=0;
-  if (stickers) strncpy(new_job->Stickers, stickers, MAX_STICKERS);
-    
+  strncpy(new_job->Stickers, stickers ? stickers : "", STICKERS_SIZE)[STICKERS_SIZE-1]=0;
+  
   if (first_job_ptr) {
     Job_ptr* last_job_ptr = first_job_ptr;
     while (last_job_ptr->Next_ptr) last_job_ptr=last_job_ptr->Next_ptr;
@@ -53,12 +60,10 @@ void jobs_list_save(uint8_t first_key) {
 
 void jobs_list_write_dict(DictionaryIterator *iter, uint8_t first_key) {
   Job_ptr* job_ptr = first_job_ptr;
-  Job * job;
-  char buffer[JOB_NAME_LENGTH+MAX_STICKERS+30];
+  uint8_t result;
   while (job_ptr) {
-    job=job_ptr->Job;
-    snprintf(buffer,JOB_NAME_LENGTH+MAX_STICKERS+30,"%s|%d|%s",job->Name, job->Count, job->Stickers);
-    dict_write_cstring(iter, first_key++, buffer);
+    result=dict_write_data(iter,first_key++, (void*) job_ptr->Job, sizeof(Job));
+    LOG("job %d, result %d, not enough storate=%d", (int) first_key, (int) result, (int) DICT_NOT_ENOUGH_STORAGE);
     job_ptr=job_ptr->Next_ptr;
   }
 }
@@ -67,28 +72,20 @@ void jobs_list_read_dict(DictionaryIterator *iter, uint8_t first_key, const uint
   if (first_job_ptr!=NULL) return;
   
   Tuple *tuple_t;
-  uint8_t fields=3;
-  char buffer[fields][JOB_NAME_LENGTH+MAX_STICKERS];
-  
+  Job* job=malloc(sizeof(Job));
   while ((tuple_t=dict_find(iter, first_key++))) {
-    char *source = tuple_t->value->cstring;
-    for (int c=0; c<fields; c++) {
-      uint d=0; // destination offset
-      while (*source && *source!='|' && d<JOB_NAME_LENGTH+MAX_STICKERS) {
-        buffer[c][d++]=*source++;
-      }
-      while (*source && *source!='|') source++;
-      buffer[c][d]=0;
-      source++;
-    }
-    jobs_list_append_job(buffer[0], atoi(buffer[1]), buffer[2]);
+    memcpy((void*) job, (void*) tuple_t->value->data, tuple_t->length);
+    jobs_list_append_job(job->Name, job->Count, job->Stickers);
   }
+  free(job);
 }
 
-void jobs_list_load2(int8_t first_key, const uint8_t version) {
+void jobs_list_load2(uint8_t first_key, const uint8_t version) {
   ERROR("Loading fake data");
-  jobs_list_append_job("Millie",19,"ABCDEFGHIJKLMNOPQRS");
-  jobs_list_append_job("Penny",0,"");
+  LOG("size of job: %d", (int) sizeof(Job));
+  
+  jobs_list_append_job("Millie",1, "\x13");
+  jobs_list_append_job("Penny",0, NULL);
 }
 
 void jobs_list_load(uint8_t first_key, const uint8_t version) {
@@ -100,7 +97,7 @@ void jobs_list_load(uint8_t first_key, const uint8_t version) {
     new_job = malloc(sizeof(Job));
     persist_read_data(first_key, new_job, sizeof(Job));
     
-    LOG("loaded job: %s, count=%d stickers=%s", new_job->Name, new_job->Count, new_job->Stickers);
+    LOG("loaded job: %s, count=%d", new_job->Name, new_job->Count);
     new_job_ptr = malloc(sizeof(Job_ptr));
     new_job_ptr->Job = new_job;
     new_job_ptr->Next_ptr = NULL;
@@ -113,13 +110,6 @@ void jobs_list_load(uint8_t first_key, const uint8_t version) {
   LOG("Loaded %d jobs.",jobs_count);
 }
 
-Job* jobs_list_get_index(uint8_t index) {
-  if (index>=jobs_count) return NULL;
-  Job_ptr* job_ptr = first_job_ptr;
-  while (index--) job_ptr=job_ptr->Next_ptr;
-  return job_ptr->Job;
-}
-
 // *****************************************************************************************************
 // PUBLIC FUNCTIONS
 // *****************************************************************************************************
@@ -130,10 +120,10 @@ static void callback(const char* result, size_t result_length, void* extra) {
   if (index==-1) {
     jobs_list_append_job(result, 0, NULL);
   } else {
-    snprintf(jobs_list_get_index(index)->Name,JOB_NAME_LENGTH, result);
+    strncpy(jobs_list_get_index(index)->Name, result, JOB_NAME_SIZE)[JOB_NAME_SIZE-1]=0;
   }
   main_menu_highlight_job(jobs_count-1);
-  main_save_data();
+  main_save_data(0);
   main_menu_update();
 }
 
@@ -174,7 +164,7 @@ void jobs_delete_job_and_save(uint8_t index) {
   free(job_ptr);
   
   jobs_count--;
-  main_save_data();
+  main_save_data(0);
   main_menu_update();
 }
 
@@ -184,24 +174,25 @@ char* jobs_get_job_name(uint8_t index) {
 }
 
 char* jobs_get_job_stickers(uint8_t index) {
-  Job* job=jobs_list_get_index(index);
-  return (job) ? job->Stickers : NULL;
+  return jobs_list_get_index(index)->Stickers;
 }
 
 uint8_t jobs_add_sticker(uint8_t index, uint8_t sticker) {
   Job* job=jobs_list_get_index(index);
   char* stickers = job->Stickers;
-  while (*stickers) stickers++;
-  if (stickers - job->Stickers == MAX_STICKERS) {
+  uint8_t n=0;
+  while (stickers[n]) n++;
+  if (n == MAX_STICKERS) {
     LOG("shifting stickers");
-    for (stickers=job->Stickers; stickers-job->Stickers < MAX_STICKERS-EMOJI_PAGE_COLS; stickers++) {
-      *stickers=*(stickers+EMOJI_PAGE_COLS);
+    for (n=EMOJI_PAGE_COLS; n < MAX_STICKERS; n++) {
+      stickers[n]=stickers[n-EMOJI_PAGE_COLS];
     }
-    for (uint8_t a=0; a<EMOJI_PAGE_COLS; a++) *(stickers+a)='\0';
+    for (n=MAX_STICKERS-EMOJI_PAGE_COLS; n<MAX_STICKERS; n++) stickers[n]=0;
+    n=MAX_STICKERS-EMOJI_PAGE_COLS;
   }
-  *stickers = sticker + FIRST_ASCII;
+  stickers[n] = sticker+1;
   job->Count++;
-  main_save_data();
+  main_save_data(0);
   return job->Count;
 }
 
@@ -212,7 +203,7 @@ bool jobs_delete_sticker(uint8_t index) {
   while (*stickers) stickers++;
   *--stickers='\0';
   job->Count--;
-  main_save_data();
+  main_save_data(0);
   return true;
 }
 
