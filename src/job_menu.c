@@ -49,9 +49,9 @@ static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *c
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   switch (cell_index->row) {
     case MENU_JOB: menu_cell_draw_job(ctx, cell_layer, job_index); break;
-    case MENU_RENAME: menu_cell_draw_other(ctx, cell_layer, "Rename", NULL, bitmap_edit); break;
-    case MENU_SUB: menu_cell_draw_other(ctx, cell_layer, "Remove sticker", NULL, bitmap_minus); break;
-    case MENU_DELETE: menu_cell_draw_other(ctx, cell_layer, "Delete child", NULL, bitmap_delete); break;
+    case MENU_RENAME: menu_cell_draw_other(ctx, cell_layer, "Rename", NULL, bitmaps[BITMAP_EDIT]); break;
+    case MENU_SUB: menu_cell_draw_other(ctx, cell_layer, "Remove sticker", NULL, bitmaps[BITMAP_MINUS]); break;
+    case MENU_DELETE: menu_cell_draw_other(ctx, cell_layer, "Delete child", NULL, bitmaps[BITMAP_DELETE]); break;
   }
 }
 

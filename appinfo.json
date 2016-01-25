@@ -16,14 +16,21 @@
     "resources": {
         "media": [
             {
+                "file": "images/icons_bonw.png",
+                "name": "IMAGE_ICON_MATRIX",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/icons_wonb.png",
+                "name": "IMAGE_ICON_MATRIX_INV",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
                 "file": "images/menu_icon.png",
                 "menuIcon": true,
                 "name": "IMAGE_MENU_ICON",
-                "type": "png"
-            },
-            {
-                "file": "images/icons.png",
-                "name": "IMAGE_ICON_MATRIX",
                 "type": "png"
             },
             {

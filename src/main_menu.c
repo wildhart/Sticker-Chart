@@ -3,6 +3,8 @@
 static Window *s_window;
 static MenuLayer *s_menulayer;
 
+static bool check_phone_message = false;
+
 static void initialise_ui(void) {
   s_window = window_create();
   #ifndef PBL_SDK_3
@@ -69,11 +71,13 @@ static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *c
 
 void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t index) {
   GRect bounds = layer_get_frame(cell_layer);
-  graphics_context_set_compositing_mode(ctx, GCompOpSet); // transparency
-    
-#ifdef PBL_SDK_2
+  // http://newscentral.exsees.com/item/ac0cacd0083161de2ffe8161eb40fa51-15e3726b28defcbc9eb59ade232b5de3
+  graphics_context_set_compositing_mode(ctx, PBL_IF_SDK_3_ELSE(GCompOpSet, GCompOpClear)); // transparency
+
+  #ifndef PBL_SDK_3
   graphics_context_set_text_color(ctx, GColorBlack);
-#endif
+  #endif
+
   graphics_draw_text(ctx, jobs[index].Name, FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_draw_text(ctx, jobs_get_job_count_as_text(index), FONT_GOTHIC_18, GRect(4, 2, bounds.size.w-8, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
@@ -94,29 +98,19 @@ void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t in
   }
 }
 
-void menu_cell_draw_other(GContext* ctx, const Layer *cell_layer, const char *title, const char *sub_title, GBitmap * icon) {
+void menu_cell_draw_other(GContext* ctx, const Layer *cell_layer, const char *title, const char *sub_title, GBitmap ** icon) {
   GRect bounds = layer_get_frame(cell_layer);
-    
-#ifdef PBL_SDK_2
+  
+  #ifndef PBL_SDK_3
   graphics_context_set_text_color(ctx, GColorBlack);
-#endif
+  #endif
+  
   graphics_draw_text(ctx, title, FONT_GOTHIC_24_BOLD, GRect(28, -4, bounds.size.w-28, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   if (sub_title) graphics_draw_text(ctx, sub_title, FONT_GOTHIC_18, GRect(28, 20, bounds.size.w-28-4, 14), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 
-  if (icon) graphics_draw_bitmap_in_rect(ctx, icon, GRect(6,(bounds.size.h-16)/2, 16, 16));
+  if (icon) graphics_draw_bitmap_in_rect(ctx, icon[PBL_IF_SDK_3_ELSE(menu_cell_layer_is_highlighted(cell_layer), 0)], GRect(6,(bounds.size.h-16)/2, 16, 16));
 }
-/*
-static void menu_cell_draw_setting(GContext* ctx, const Layer *cell_layer, const char *title, const char *setting, const char *hint) {
-  GRect bounds = layer_get_frame(cell_layer);
-    
-#ifdef PBL_SDK_2
-  graphics_context_set_text_color(ctx, GColorBlack);
-#endif
-  graphics_draw_text(ctx, title, FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
-  graphics_draw_text(ctx, setting, FONT_GOTHIC_18_BOLD, GRect(4, 2, bounds.size.w-8, 18), GTextOverflowModeFill, GTextAlignmentRight, NULL);
-  graphics_draw_text(ctx, hint, FONT_GOTHIC_18, GRect(4, 20, bounds.size.w-8, 14), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
-}
-*/
+
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   switch (cell_index->section) {
     case MENU_SECTION_JOBS:
@@ -125,10 +119,15 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 
     default:
       switch (MENU_SECTION_CELL) {
-        case MENU_SETTINGS_ADD: menu_cell_draw_other(ctx, cell_layer, "Add Child", NULL, bitmap_add); break;
-        case MENU_SETTINGS_CONFIG: menu_cell_draw_other(ctx, cell_layer, "Config/Donate", NULL , bitmap_settings); break;
+        case MENU_SETTINGS_ADD: menu_cell_draw_other(ctx, cell_layer, "Add Child", NULL, bitmaps[BITMAP_ADD]); break;
+        case MENU_SETTINGS_CONFIG: menu_cell_draw_other(ctx, cell_layer, check_phone_message ? "Check phone..." : "Config/Donate", NULL , bitmaps[BITMAP_SETTINGS]); break;
       }
   }
+}
+
+static void timer_callback(void *data) {
+    check_phone_message=false;
+    menu_layer_reload_data(s_menulayer);
 }
 
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
@@ -142,6 +141,9 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
         case MENU_SETTINGS_CONFIG:
           export_after_save=true;
           main_save_data(1);
+          check_phone_message=true;
+          menu_layer_reload_data(s_menulayer);
+          app_timer_register(2000 /* milliseconds */, timer_callback, NULL);
           break;
       }
   }

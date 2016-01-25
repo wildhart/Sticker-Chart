@@ -25,6 +25,14 @@
 #define HEAP(text) APP_LOG(APP_LOG_LEVEL_INFO, "heap: %d, used: %d, free: %d, %s %s",  heap_bytes_used()+heap_bytes_free(), heap_bytes_used(), heap_bytes_free(), __func__, text)
 #endif
 
+#ifdef PBL_SDK_3
+#define PBL_IF_SDK_3(X)          (X)
+#define PBL_IF_SDK_3_ELSE(X, Y)  (X)
+#else // PBL_SDK_3
+#define PBL_IF_SDK_3(X)
+#define PBL_IF_SDK_3_ELSE(X, Y)  (Y)
+#define gbitmap_set_bounds(bmp, new_bounds) ((bmp)->bounds = (new_bounds))
+#endif // PBL_SDK_3
 
 #define ANIMATED true
 #define HIDDEN true
@@ -56,17 +64,17 @@
 #define ICON_RECT_MINUS       (GRect) { { 16, 48 }, { 16, 16 } }
 #define ICON_RECT_CLOCK       (GRect) { { 32, 16 }, { 16, 16 } }
 
-extern GBitmap *bitmap_matrix;
-//extern GBitmap *bitmap_pause;
-//extern GBitmap *bitmap_play;
-extern GBitmap *bitmap_add;
-extern GBitmap *bitmap_settings;
-extern GBitmap *bitmap_delete;
-extern GBitmap *bitmap_edit;
-//extern GBitmap *bitmap_adjust;
-//extern GBitmap *bitmap_reset;
-extern GBitmap *bitmap_minus;
-//extern GBitmap *bitmap_tick;
+enum  {
+  BITMAP_MATRIX,
+  BITMAP_ADD,
+  BITMAP_SETTINGS,
+  BITMAP_DELETE,
+  BITMAP_EDIT,
+  BITMAP_MINUS,
+  N_BITMAPS
+};
+
+extern GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
 
 #define MAX_EMOJI_PAGES 5
 #define EMOJI_PAGE_COLS 5
