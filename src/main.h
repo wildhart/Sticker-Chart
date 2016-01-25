@@ -25,6 +25,14 @@
 #define HEAP(text) APP_LOG(APP_LOG_LEVEL_INFO, "heap: %d, used: %d, free: %d, %s %s",  heap_bytes_used()+heap_bytes_free(), heap_bytes_used(), heap_bytes_free(), __func__, text)
 #endif
 
+#ifdef PBL_SDK_3
+#define PBL_IF_SDK_3(X)          (X)
+#define PBL_IF_SDK_3_ELSE(X, Y)  (X)
+#else // PBL_SDK_3
+#define PBL_IF_SDK_3(X)
+#define PBL_IF_SDK_3_ELSE(X, Y)  (Y)
+#define gbitmap_set_bounds(bmp, new_bounds) ((bmp)->bounds = (new_bounds))
+#endif // PBL_SDK_3
 
 #define ANIMATED true
 #define HIDDEN true

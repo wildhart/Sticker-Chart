@@ -17,7 +17,8 @@ enum {
 static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
   uint8_t w,h,ox,oy,tw,tox,toy;
   GRect bounds = layer_get_frame(layer);
-  graphics_context_set_compositing_mode(ctx, GCompOpSet); // transparency
+  // http://newscentral.exsees.com/item/ac0cacd0083161de2ffe8161eb40fa51-15e3726b28defcbc9eb59ade232b5de3
+  graphics_context_set_compositing_mode(ctx, PBL_IF_SDK_3_ELSE(GCompOpSet, GCompOpClear)); // transparency
   
   // tabs
   tw = bounds.size.w / MAX_EMOJI_PAGES;
@@ -81,9 +82,9 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
     
   if (page_selected==PAGE_EMOJIS) {    
     // draw gray box behind tabs
-    graphics_context_set_fill_color(ctx,GColorLightGray);
-    graphics_fill_rect(ctx, GRect(0, 0, tox+tw*tab_selected-1, toy+EMOJI_HEIGHT), 0, GCornerNone);
-    graphics_fill_rect(ctx, GRect(tox+tw*tab_selected-1+EMOJI_WIDTH+3, 0, bounds.size.w, toy+EMOJI_HEIGHT), 0, GCornerNone);
+    graphics_context_set_fill_color(ctx,PBL_IF_SDK_3_ELSE(GColorLightGray,GColorBlack));
+    graphics_fill_rect(ctx, GRect(0, 0, tox+tw*tab_selected-0 /* was 1 on SDK3*/, toy+EMOJI_HEIGHT), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(tox+tw*tab_selected-1+EMOJI_WIDTH+2 /* was 3 on SDK3*/, 0, bounds.size.w, toy+EMOJI_HEIGHT), 0, GCornerNone);
     // highlight selected emoji
     uint8_t x = emoji_selected % EMOJI_PAGE_COLS;
     uint8_t y = emoji_selected / EMOJI_PAGE_COLS;
@@ -181,4 +182,8 @@ void emoji_menu_show(uint8_t index) {
 
 void emoji_menu_hide(void) {
   window_stack_remove(s_window, true);
+}
+
+void emoji_menu_redraw(void) {
+  if (s_window && window_is_loaded(s_window)) layer_mark_dirty(graphics_layer);
 }

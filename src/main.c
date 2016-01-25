@@ -63,7 +63,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   JS_ready = true;
   Tuple *tuple_t;
   
-  ERROR("Ignoring phone data!"); return;
+  //ERROR("Ignoring phone data!"); return;
 
   bool new_data_from_config_page = dict_find(iter, KEY_CONFIG_DATA);
   tuple_t= dict_find(iter, KEY_TIMESTAMP);
@@ -83,6 +83,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     }
     main_save_data(data_timestamp);
     main_menu_highlight_job(0);
+    emoji_menu_redraw();
   } else if (inbox_timestamp < data_timestamp) {
     send_settings_to_phone();
   }
@@ -125,12 +126,13 @@ static void main_load_data(void) {
 // MAIN
 // *****************************************************************************************************
 
-//#ifndef gbitmap_set_bounds
-//#define gbitmap_set_bounds(bmp, new_bounds) ((bmp)->bounds = (new_bounds))
-//#endif
-
 static uint8_t last_matrix=99;
+
+#ifdef PBL_SDK_3
 static uint32_t emoji_images[MAX_EMOJI_PAGES]={RESOURCE_ID_IMAGE_EMOJI_C1,RESOURCE_ID_IMAGE_EMOJI_C2,RESOURCE_ID_IMAGE_EMOJI_C3,RESOURCE_ID_IMAGE_EMOJI_C4,RESOURCE_ID_IMAGE_EMOJI_C5};
+#else
+static uint32_t emoji_images[MAX_EMOJI_PAGES]={RESOURCE_ID_IMAGE_EMOJI_1_BLACK,RESOURCE_ID_IMAGE_EMOJI_2,RESOURCE_ID_IMAGE_EMOJI_3,RESOURCE_ID_IMAGE_EMOJI_4,RESOURCE_ID_IMAGE_EMOJI_5};
+#endif
 static GBitmap *emoji_buffer=NULL;
 
 GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y) {

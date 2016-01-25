@@ -1,7 +1,6 @@
 #include "main.h"
 
 struct Job jobs[MAX_JOBS];
-
 uint8_t jobs_count=0;
 
 // *****************************************************************************************************
@@ -40,16 +39,15 @@ void jobs_list_read_dict(DictionaryIterator *iter, uint8_t first_key, const uint
   }
 }
 
-void jobs_list_load(uint8_t first_key, const uint8_t version) {
+void jobs_list_load2(uint8_t first_key, const uint8_t version) {
   ERROR("Loading fake data");
   LOG("size of job: %d", (int) sizeof(jobs[0]));
   
   jobs_list_append_job("Millie",1, "\x13");
   jobs_list_append_job("Penny",0, NULL);
-  jobs_list_append_job("3",0, NULL);
 }
 
-void jobs_list_load2(uint8_t first_key, const uint8_t version) {
+void jobs_list_load(uint8_t first_key, const uint8_t version) {
   LOG("key=%d, exists=%d", first_key, persist_exists(first_key));
   while (persist_exists(first_key)) {
     struct Job* new_job=&jobs[jobs_count++];
@@ -105,7 +103,7 @@ uint8_t jobs_add_sticker(uint8_t index, uint8_t sticker) {
   if (n == MAX_STICKERS) {
     LOG("shifting stickers");
     for (n=EMOJI_PAGE_COLS; n < MAX_STICKERS; n++) {
-      stickers[n]=stickers[n-EMOJI_PAGE_COLS];
+      stickers[n-EMOJI_PAGE_COLS]=stickers[n];
     }
     for (n=MAX_STICKERS-EMOJI_PAGE_COLS; n<MAX_STICKERS; n++) stickers[n]=0;
     n=MAX_STICKERS-EMOJI_PAGE_COLS;
