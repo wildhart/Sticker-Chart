@@ -105,7 +105,7 @@ void main_save_data(const uint32_t timestamp) {
 }
 
 static void main_load_data(void) {
-  //ERROR("ignoring saved data"); return;
+  ERROR("ignoring saved data"); return;
   
   stored_version = persist_read_int(STORAGE_KEY_VERSION); // defaults to 0 if key is missing
   
