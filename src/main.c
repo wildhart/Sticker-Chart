@@ -5,17 +5,7 @@ extern const PebbleProcessInfo __pbl_app_info;
 #define APP_VERSION_LENGTH 10
 char app_version[APP_VERSION_LENGTH];
 
-GBitmap *bitmap_matrix;
-//GBitmap *bitmap_pause;
-//GBitmap *bitmap_play;
-GBitmap *bitmap_add;
-GBitmap *bitmap_settings;
-GBitmap *bitmap_delete;
-GBitmap *bitmap_edit;
-//GBitmap *bitmap_adjust;
-//GBitmap *bitmap_reset;
-GBitmap *bitmap_minus;
-//GBitmap *bitmap_tick;
+GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
 
 static bool JS_ready = false;
 static bool data_loaded_from_watch = false;
@@ -153,17 +143,20 @@ void init(void) {
   
   main_load_data();
   
-  bitmap_matrix=gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ICON_MATRIX);
-  //bitmap_pause=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_PAUSE);
-  //bitmap_play=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_PLAY);
-  bitmap_add=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_ADD);
-  bitmap_settings=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_SETTINGS);
-  bitmap_delete=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_DELETE);
-  bitmap_edit=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_EDIT);
-  //bitmap_adjust=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_ADJUST);
-  //bitmap_reset=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_RESET);
-  bitmap_minus=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_MINUS);
-  //bitmap_tick=gbitmap_create_as_sub_bitmap(bitmap_matrix, ICON_RECT_TICK);
+  bitmaps[BITMAP_MATRIX][0]  =gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ICON_MATRIX);
+  bitmaps[BITMAP_ADD][0]     =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_ADD);
+  bitmaps[BITMAP_SETTINGS][0]=gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_SETTINGS);
+  bitmaps[BITMAP_DELETE][0]  =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_DELETE);
+  bitmaps[BITMAP_EDIT][0]    =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_EDIT);
+  bitmaps[BITMAP_MINUS][0]   =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_MINUS);
+  #ifdef PBL_SDK_3
+  bitmaps[BITMAP_MATRIX][1]  =gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ICON_MATRIX_INV);
+  bitmaps[BITMAP_ADD][1]     =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_ADD);
+  bitmaps[BITMAP_SETTINGS][1]=gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_SETTINGS);
+  bitmaps[BITMAP_DELETE][1]  =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_DELETE);
+  bitmaps[BITMAP_EDIT][1]    =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_EDIT);
+  bitmaps[BITMAP_MINUS][1]   =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_MINUS);
+  #endif
   
   main_menu_show();
 
