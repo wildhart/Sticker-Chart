@@ -74,12 +74,12 @@ void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t in
 #ifdef PBL_SDK_2
   graphics_context_set_text_color(ctx, GColorBlack);
 #endif
-  graphics_draw_text(ctx, jobs_get_job_name(index), FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  graphics_draw_text(ctx, jobs[index].Name, FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_draw_text(ctx, jobs_get_job_count_as_text(index), FONT_GOTHIC_18, GRect(4, 2, bounds.size.w-8, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
   uint8_t cell = bounds.size.w / 5;
   uint8_t marg = (cell - EMOJI_WIDTH)/2+1;
-  char* stickers=jobs_get_job_stickers(index); // always returns a zero padded string
+  char* stickers=jobs[index].Stickers; // always returns a zero padded string
   if (*stickers) {
     while (*(stickers+5)) stickers+=5;
     uint8_t i=0;

@@ -32,7 +32,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
   if (page_selected==PAGE_CHILD) {
     // Draw Childs name and # stickers;
       graphics_context_set_text_color(ctx, GColorBlack);
-      graphics_draw_text(ctx, jobs_get_job_name(child_index), FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+      graphics_draw_text(ctx, jobs[child_index].Name, FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
       graphics_draw_text(ctx, jobs_get_job_count_as_text(child_index), FONT_GOTHIC_18, GRect(4, 2, bounds.size.w-8, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
       graphics_draw_text(ctx,"Press any button to add \U00002192", FONT_GOTHIC_14, GRect(0, 20, bounds.size.w-2, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
   } else if (page_selected==PAGE_TABS) {
@@ -51,7 +51,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
   
   if (page_selected==PAGE_CHILD) {
     // draw childs stickers
-    char* stickers=jobs_get_job_stickers(child_index);
+    char* stickers=jobs[child_index].Stickers;
     uint8_t emoji;
     uint8_t i=0;
     while (*stickers) {
@@ -96,7 +96,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
 static void select_click_handler(void) {
   if (page_selected==PAGE_EMOJIS) {
     if (jobs_add_sticker(child_index, tab_selected * EMOJI_PAGE_EMOJIS + emoji_selected) % EMOJI_PAGE_COLS == 0) {
-      treat_window_show(jobs_get_job_name(child_index));
+      treat_window_show(jobs[child_index].Name);
     }
     tab_selected=emoji_selected=0;
   }

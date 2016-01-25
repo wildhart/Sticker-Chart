@@ -5,7 +5,7 @@ var timeout=null;
 Pebble.addEventListener('ready', function() {
   console.log('PebbleKit JS ready!');
   var settings=localStorage.getItem("settings");
-  //settings='{"KEY_CHILDREN":[78,101,119,32,67,104,105,108,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,32,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"KEY_TIMESTAMP":1453605730,"KEY_APP_VERSION":"1.0","KEY_VERSION":1}';
+  settings='{"1":"1.0","2":1,"4":1453695384,"100":[77,105,108,108,105,101,0,0,0,0,0,0,0,0,0,0,2,0,19,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"101":[80,101,110,110,121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"KEY_APP_VERSION":"1.0","KEY_VERSION":1,"KEY_TIMESTAMP":1453695384,"KEY_CHILDREN":[77,105,108,108,105,101,0,0,0,0,0,0,0,0,0,0,2,0,19,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}';
   var dict=settings ? JSON.parse(settings) : {};
   if (!dict.KEY_TIMESTAMP) { 
     var d=new Date();
