@@ -16,31 +16,6 @@
     "resources": {
         "media": [
             {
-                "file": "images/emoji_1_bt.png",
-                "name": "IMAGE_EMOJI_1",
-                "type": "png-trans"
-            },
-            {
-                "file": "images/emoji_5.png",
-                "name": "IMAGE_EMOJI_5",
-                "type": "png"
-            },
-            {
-                "file": "images/emoji_3.png",
-                "name": "IMAGE_EMOJI_3",
-                "type": "png"
-            },
-            {
-                "file": "images/emoji_4.png",
-                "name": "IMAGE_EMOJI_4",
-                "type": "png"
-            },
-            {
-                "file": "images/emoji_2.png",
-                "name": "IMAGE_EMOJI_2",
-                "type": "png"
-            },
-            {
                 "file": "images/menu_icon.png",
                 "menuIcon": true,
                 "name": "IMAGE_MENU_ICON",
@@ -50,6 +25,31 @@
                 "file": "images/icons.png",
                 "name": "IMAGE_ICON_MATRIX",
                 "type": "png"
+            },
+            {
+                "file": "images/emoji_5.png",
+                "name": "IMAGE_EMOJI_5",
+                "type": "png"
+            },
+            {
+                "file": "images/emoji_4.png",
+                "name": "IMAGE_EMOJI_4",
+                "type": "png"
+            },
+            {
+                "file": "images/emoji_3.png",
+                "name": "IMAGE_EMOJI_3",
+                "type": "png"
+            },
+            {
+                "file": "images/emoji_2.png",
+                "name": "IMAGE_EMOJI_2",
+                "type": "png"
+            },
+            {
+                "file": "images/emoji_1_bt.png",
+                "name": "IMAGE_EMOJI_1",
+                "type": "png-trans"
             }
         ]
     },
