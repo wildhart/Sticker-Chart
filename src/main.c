@@ -59,10 +59,11 @@ static void send_settings_to_phone() {
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   LOG("Inbox received...");
-  //ERROR("Ignoring phone data!"); return;
   
   JS_ready = true;
   Tuple *tuple_t;
+  
+  ERROR("Ignoring phone data!"); return;
 
   bool new_data_from_config_page = dict_find(iter, KEY_CONFIG_DATA);
   tuple_t= dict_find(iter, KEY_TIMESTAMP);
