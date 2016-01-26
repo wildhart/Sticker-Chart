@@ -16,6 +16,11 @@
     "resources": {
         "media": [
             {
+                "file": "images/emoji_1_bw.png",
+                "name": "IMAGE_EMOJI_C1",
+                "type": "png"
+            },
+            {
                 "file": "images/menu_icon.png",
                 "menuIcon": true,
                 "name": "IMAGE_MENU_ICON",
@@ -28,28 +33,23 @@
             },
             {
                 "file": "images/emoji_5.png",
-                "name": "IMAGE_EMOJI_5",
+                "name": "IMAGE_EMOJI_C5",
                 "type": "png"
             },
             {
                 "file": "images/emoji_4.png",
-                "name": "IMAGE_EMOJI_4",
+                "name": "IMAGE_EMOJI_C4",
                 "type": "png"
             },
             {
                 "file": "images/emoji_3.png",
-                "name": "IMAGE_EMOJI_3",
+                "name": "IMAGE_EMOJI_C3",
                 "type": "png"
             },
             {
                 "file": "images/emoji_2.png",
-                "name": "IMAGE_EMOJI_2",
+                "name": "IMAGE_EMOJI_C2",
                 "type": "png"
-            },
-            {
-                "file": "images/emoji_1_bt.png",
-                "name": "IMAGE_EMOJI_1",
-                "type": "png-trans"
             }
         ]
     },

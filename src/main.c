@@ -117,21 +117,28 @@ static void main_load_data(void) {
 // *****************************************************************************************************
 
 static uint8_t last_matrix=99;
+static uint8_t last_inverted=99;
 
-#ifdef PBL_SDK_3
-static uint32_t emoji_images[MAX_EMOJI_PAGES]={RESOURCE_ID_IMAGE_EMOJI_C1,RESOURCE_ID_IMAGE_EMOJI_C2,RESOURCE_ID_IMAGE_EMOJI_C3,RESOURCE_ID_IMAGE_EMOJI_C4,RESOURCE_ID_IMAGE_EMOJI_C5};
+#ifdef PBL_SDK_3_APLITE
+// With SDK3 and B&W screen need to invert highlighted menu icon
+static uint32_t emoji_images[2][MAX_EMOJI_PAGES]={ {RESOURCE_ID_IMAGE_EMOJI_C1,RESOURCE_ID_IMAGE_EMOJI_C2,RESOURCE_ID_IMAGE_EMOJI_C3,RESOURCE_ID_IMAGE_EMOJI_C4,RESOURCE_ID_IMAGE_EMOJI_C5}
+                                                 , {RESOURCE_ID_IMAGE_EMOJI_1_INV,RESOURCE_ID_IMAGE_EMOJI_2_INV,RESOURCE_ID_IMAGE_EMOJI_3_INV,RESOURCE_ID_IMAGE_EMOJI_4_INV,RESOURCE_ID_IMAGE_EMOJI_5_INV}
+                                                 };
 #else
-static uint32_t emoji_images[MAX_EMOJI_PAGES]={RESOURCE_ID_IMAGE_EMOJI_1_BLACK,RESOURCE_ID_IMAGE_EMOJI_2,RESOURCE_ID_IMAGE_EMOJI_3,RESOURCE_ID_IMAGE_EMOJI_4,RESOURCE_ID_IMAGE_EMOJI_5};
+// with SDK2 IMAGES are inverted automatically, and we don't want to invert colour images
+static uint32_t emoji_images[1][MAX_EMOJI_PAGES]={{RESOURCE_ID_IMAGE_EMOJI_C1,RESOURCE_ID_IMAGE_EMOJI_C2,RESOURCE_ID_IMAGE_EMOJI_C3,RESOURCE_ID_IMAGE_EMOJI_C4,RESOURCE_ID_IMAGE_EMOJI_C5}};
 #endif
+
 static GBitmap *emoji_buffer=NULL;
 
-GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y) {
-  if (page != last_matrix) {
+GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y, const bool inverted) {
+  if (page != last_matrix || inverted != last_inverted) {
     //LOG("%d",page);
     //HEAP("about to load bitmap...");
     if (emoji_buffer) gbitmap_destroy(emoji_buffer);
     last_matrix=page;
-    emoji_buffer=gbitmap_create_with_resource(emoji_images[page]);
+    last_inverted=inverted;
+    emoji_buffer=gbitmap_create_with_resource(emoji_images[inverted][page]);
     //HEAP("loaded bitmap");
   }
   gbitmap_set_bounds(emoji_buffer, GRect(EMOJI_WIDTH*x,EMOJI_HEIGHT*y,EMOJI_WIDTH,EMOJI_HEIGHT));
@@ -150,6 +157,7 @@ void init(void) {
   bitmaps[BITMAP_EDIT][0]    =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_EDIT);
   bitmaps[BITMAP_MINUS][0]   =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][0], ICON_RECT_MINUS);
   #ifdef PBL_SDK_3
+  // SDK 3 doesn't invert highligted menu icon, so need to use pre-inverted image...
   bitmaps[BITMAP_MATRIX][1]  =gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ICON_MATRIX_INV);
   bitmaps[BITMAP_ADD][1]     =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_ADD);
   bitmaps[BITMAP_SETTINGS][1]=gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_SETTINGS);
