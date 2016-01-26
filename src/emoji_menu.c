@@ -18,7 +18,10 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
   uint8_t w,h,ox,oy,tw,tox,toy;
   GRect bounds = layer_get_frame(layer);
   // http://newscentral.exsees.com/item/ac0cacd0083161de2ffe8161eb40fa51-15e3726b28defcbc9eb59ade232b5de3
-  graphics_context_set_compositing_mode(ctx, PBL_IF_SDK_3_ELSE(GCompOpSet, GCompOpClear)); // transparency
+  // SDK 2, not include this line.
+  #ifdef PBL_SDK_3
+  graphics_context_set_compositing_mode(ctx, GCompOpSet); // transparency
+  #endif
   
   // tabs
   tw = bounds.size.w / MAX_EMOJI_PAGES;
@@ -35,13 +38,13 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
       graphics_context_set_text_color(ctx, GColorBlack);
       graphics_draw_text(ctx, jobs[child_index].Name, FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
       graphics_draw_text(ctx, jobs_get_job_count_as_text(child_index), FONT_GOTHIC_18, GRect(4, 2, bounds.size.w-8, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
-      graphics_draw_text(ctx,"Press any button to add \U00002192", FONT_GOTHIC_14, GRect(0, 20, bounds.size.w-2, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
+      graphics_draw_text(ctx,PBL_IF_COLOR_ELSE("Press any button to add \U00002192","Press any button to add ->"), FONT_GOTHIC_14, GRect(0, 20, bounds.size.w-2, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
   } else if (page_selected==PAGE_TABS) {
     // Draw all tab icons
-    for (uint8_t x=0; x<MAX_EMOJI_PAGES; x++) graphics_draw_bitmap_in_rect(ctx, main_get_emoji(x,0,0), GRect(tox+tw*x, toy, EMOJI_WIDTH, EMOJI_HEIGHT));
+    for (uint8_t x=0; x<MAX_EMOJI_PAGES; x++) graphics_draw_bitmap_in_rect(ctx, main_get_emoji(x,0,0,0), GRect(tox+tw*x, toy, EMOJI_WIDTH, EMOJI_HEIGHT));
   } else if (page_selected==PAGE_EMOJIS) {
     // Draw selected tab
-    graphics_draw_bitmap_in_rect(ctx, main_get_emoji(tab_selected,0,0), GRect(tox+tw*tab_selected, toy, EMOJI_WIDTH, EMOJI_HEIGHT));
+    graphics_draw_bitmap_in_rect(ctx, main_get_emoji(tab_selected,0,0,0), GRect(tox+tw*tab_selected, toy, EMOJI_WIDTH, EMOJI_HEIGHT));
   }
   
   // Draw emoji grid
@@ -57,7 +60,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
     uint8_t i=0;
     while (*stickers) {
       emoji = *stickers-1;
-      graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji), GRect(ox+w*(i%EMOJI_PAGE_COLS), oy+h*(i/EMOJI_PAGE_COLS), EMOJI_WIDTH, EMOJI_HEIGHT));
+      graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji,0), GRect(ox+w*(i%EMOJI_PAGE_COLS), oy+h*(i/EMOJI_PAGE_COLS), EMOJI_WIDTH, EMOJI_HEIGHT));
       stickers++;
       i++;
     }
@@ -65,7 +68,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
     // draw emoji grid
     for (uint8_t y=0; y<EMOJI_PAGE_ROWS; y++) {
       for (uint8_t x=0; x<EMOJI_PAGE_COLS; x++) {
-        graphics_draw_bitmap_in_rect(ctx, main_get_emoji(tab_selected,x,y), GRect(ox+w*x, oy+h*y, EMOJI_WIDTH, EMOJI_HEIGHT));
+        graphics_draw_bitmap_in_rect(ctx, main_get_emoji(tab_selected,x,y,0), GRect(ox+w*x, oy+h*y, EMOJI_WIDTH, EMOJI_HEIGHT));
       }
     }
   }
@@ -83,8 +86,8 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
   if (page_selected==PAGE_EMOJIS) {    
     // draw gray box behind tabs
     graphics_context_set_fill_color(ctx,PBL_IF_SDK_3_ELSE(GColorLightGray,GColorBlack));
-    graphics_fill_rect(ctx, GRect(0, 0, tox+tw*tab_selected-0 /* was 1 on SDK3*/, toy+EMOJI_HEIGHT), 0, GCornerNone);
-    graphics_fill_rect(ctx, GRect(tox+tw*tab_selected-1+EMOJI_WIDTH+2 /* was 3 on SDK3*/, 0, bounds.size.w, toy+EMOJI_HEIGHT), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(0, 0, tox+tw*tab_selected-PBL_IF_SDK_3_ELSE(1,0), toy+EMOJI_HEIGHT), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(tox+tw*tab_selected-1+EMOJI_WIDTH+PBL_IF_SDK_3_ELSE(3,2), 0, bounds.size.w, toy+EMOJI_HEIGHT), 0, GCornerNone);
     // highlight selected emoji
     uint8_t x = emoji_selected % EMOJI_PAGE_COLS;
     uint8_t y = emoji_selected / EMOJI_PAGE_COLS;
@@ -150,6 +153,7 @@ static void initialise_ui(void) {
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
+  //window_set_background_color(s_window,GColorBlack);
   
   GRect bounds = layer_get_bounds(window_get_root_layer(s_window));
   // Initialise the general graphics layer

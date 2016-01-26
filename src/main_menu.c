@@ -72,7 +72,9 @@ static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *c
 void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t index) {
   GRect bounds = layer_get_frame(cell_layer);
   // http://newscentral.exsees.com/item/ac0cacd0083161de2ffe8161eb40fa51-15e3726b28defcbc9eb59ade232b5de3
-  graphics_context_set_compositing_mode(ctx, PBL_IF_SDK_3_ELSE(GCompOpSet, GCompOpClear)); // transparency
+  #ifdef PBL_SDK_3
+  graphics_context_set_compositing_mode(ctx, GCompOpSet); // transparency
+  #endif
 
   #ifndef PBL_SDK_3
   graphics_context_set_text_color(ctx, GColorBlack);
@@ -89,7 +91,7 @@ void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t in
     uint8_t i=0;
     while (*stickers) {
       uint8_t emoji=*stickers-1;
-      graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji), GRect(marg+cell*(i++),23, EMOJI_WIDTH, EMOJI_HEIGHT));
+      graphics_draw_bitmap_in_rect(ctx, EMOJI_INDEX(emoji, PBL_IF_SDK_3_APLITE_ELSE(menu_cell_layer_is_highlighted(cell_layer), 0)), GRect(marg+cell*(i++),23, EMOJI_WIDTH, EMOJI_HEIGHT));
       stickers++;
     }
   } else {

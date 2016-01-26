@@ -28,9 +28,18 @@
 #ifdef PBL_SDK_3
 #define PBL_IF_SDK_3(X)          (X)
 #define PBL_IF_SDK_3_ELSE(X, Y)  (X)
+  #ifdef PBL_PLATFORM_APLITE
+  #define PBL_SDK_3_APLITE                1
+  #define PBL_IF_SDK_3_APLITE_ELSE(X, Y)  (X)
+  #else
+  #define PBL_IF_SDK_3_APLITE_ELSE(X, Y)  (Y)
+  #endif
 #else // PBL_SDK_3
+  #define PBL_IF_SDK_3_APLITE_ELSE(X, Y)  (Y)
 #define PBL_IF_SDK_3(X)
 #define PBL_IF_SDK_3_ELSE(X, Y)  (Y)
+#define PBL_IF_COLOR_ELSE(X, Y)  (Y)
+#define PBL_IF_BW_ELSE(X, Y)     (X)
 #define gbitmap_set_bounds(bmp, new_bounds) ((bmp)->bounds = (new_bounds))
 #endif // PBL_SDK_3
 
@@ -100,6 +109,6 @@ extern GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
 
 extern bool export_after_save;
 
-#define EMOJI_INDEX(I) (main_get_emoji((I)/EMOJI_PAGE_EMOJIS, (I)%EMOJI_PAGE_COLS, ((I)%EMOJI_PAGE_EMOJIS)/EMOJI_PAGE_COLS))
-GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y);
+#define EMOJI_INDEX(I,INV) (main_get_emoji((I)/EMOJI_PAGE_EMOJIS, (I)%EMOJI_PAGE_COLS, ((I)%EMOJI_PAGE_EMOJIS)/EMOJI_PAGE_COLS, (INV)))
+GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y, const bool inverted);
 void main_save_data(const uint32_t timestamp);
