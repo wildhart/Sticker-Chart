@@ -12,9 +12,10 @@ static void initialise_ui(void) {
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
+  GRect bounds = layer_get_bounds(window_get_root_layer(s_window));
   
   // s_menulayer
-  s_menulayer = menu_layer_create(GRect(0, 0, 144, 152));
+  s_menulayer = menu_layer_create(GRect(0, 0, bounds.size.w, bounds.size.h));
   menu_layer_set_click_config_onto_window(s_menulayer, s_window);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_menulayer);
 }
@@ -49,9 +50,9 @@ static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *c
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   switch (cell_index->row) {
     case MENU_JOB: menu_cell_draw_job(ctx, cell_layer, job_index); break;
-    case MENU_RENAME: menu_cell_draw_other(ctx, cell_layer, "Rename", NULL, bitmaps[BITMAP_EDIT]); break;
-    case MENU_SUB: menu_cell_draw_other(ctx, cell_layer, "Remove sticker", NULL, bitmaps[BITMAP_MINUS]); break;
-    case MENU_DELETE: menu_cell_draw_other(ctx, cell_layer, "Delete child", NULL, bitmaps[BITMAP_DELETE]); break;
+    case MENU_RENAME: menu_cell_draw_other(ctx, cell_layer, "Rename", bitmaps[BITMAP_EDIT]); break;
+    case MENU_SUB: menu_cell_draw_other(ctx, cell_layer, "Remove sticker", bitmaps[BITMAP_MINUS]); break;
+    case MENU_DELETE: menu_cell_draw_other(ctx, cell_layer, "Delete child", bitmaps[BITMAP_DELETE]); break;
   }
 }
 

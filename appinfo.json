@@ -16,6 +16,14 @@
     "resources": {
         "media": [
             {
+                "file": "images/tabs80pc_ct.png",
+                "name": "IMAGE_ROUND_TABS",
+                "targetPlatforms": [
+                    "chalk"
+                ],
+                "type": "bitmap"
+            },
+            {
                 "file": "images/emoji_5_c.png",
                 "name": "IMAGE_EMOJI_C5",
                 "targetPlatforms": null,
@@ -108,8 +116,7 @@
     "sdkVersion": "3",
     "shortName": "Sticker Chart",
     "targetPlatforms": [
-        "aplite",
-        "basalt"
+        "chalk"
     ],
     "uuid": "feafaa6c-dfbd-4e0a-a6ca-bf17bd77ed59",
     "versionLabel": "1.0",
