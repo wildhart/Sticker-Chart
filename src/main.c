@@ -147,7 +147,7 @@ GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y, co
   }
   // decided to convert the 5x4 image grid to be displayed 4x5 on the screen, so need to swap ROWS and COLS divisors.
   uint8_t i=y*EMOJI_PAGE_COLS + x;
-  gbitmap_set_bounds(emoji_buffer, GRect(EMOJI_WIDTH*(i%EMOJI_CHILD_COLS)+1,EMOJI_HEIGHT*(i/EMOJI_CHILD_COLS),EMOJI_WIDTH,EMOJI_HEIGHT));
+  gbitmap_set_bounds(emoji_buffer, GRect(EMOJI_WIDTH*(i%EMOJI_CHILD_COLS),EMOJI_HEIGHT*(i/EMOJI_CHILD_COLS),EMOJI_WIDTH,EMOJI_HEIGHT));
   return emoji_buffer;
 }
 

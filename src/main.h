@@ -42,6 +42,8 @@
 #define PBL_IF_ROUND_ELSE(X, Y)  (Y)
 #define PBL_IF_BW_ELSE(X, Y)     (X)
 #define gbitmap_set_bounds(bmp, new_bounds) ((bmp)->bounds = (new_bounds))
+#define GColorLightGray          GColorBlack
+#define GColorDarkGray          GColorBlack
 #endif // PBL_SDK_3
 #define ROUND_MARGIN          PBL_IF_ROUND_ELSE(2,0)
 
