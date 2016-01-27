@@ -52,10 +52,12 @@ static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t secti
   }
 }
 
+#ifndef PBL_ROUND
 static int16_t menu_get_header_height_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
   // This is a define provided in pebble.h that you may use for the default height
   return (section_index==MENU_SECTION_SETTINGS) ? MENU_CELL_BASIC_HEADER_HEIGHT : 0;
 }
+#endif
 
 static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t section_index, void *data) {
   // Determine which section we're working with
@@ -64,30 +66,47 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
 
 static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   if (cell_index->section == MENU_SECTION_JOBS) {
+  //  #ifdef PBL_ROUND
+  //  MenuIndex si=menu_layer_get_selected_index(menu_layer);
+  //  return (cell_index->section == si.section && cell_index->row==si.row) ? MENU_HEIGHT_JOB : MENU_HEIGHT_SINGLE;
+  //  #else
     return MENU_HEIGHT_JOB;
+  //  #endif
   }
   return MENU_HEIGHT_SINGLE;
 }
 
 void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t index) {
   GRect bounds = layer_get_frame(cell_layer);
+  
   // http://newscentral.exsees.com/item/ac0cacd0083161de2ffe8161eb40fa51-15e3726b28defcbc9eb59ade232b5de3
   #ifdef PBL_SDK_3
   graphics_context_set_compositing_mode(ctx, GCompOpSet); // transparency
-  #endif
-
-  #ifndef PBL_SDK_3
+  #else
   graphics_context_set_text_color(ctx, GColorBlack);
   #endif
-
-  graphics_draw_text(ctx, jobs[index].Name, FONT_GOTHIC_24_BOLD, GRect(4, -4, bounds.size.w-8-16, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
-  graphics_draw_text(ctx, jobs_get_job_count_as_text(index), FONT_GOTHIC_18, GRect(4, 2, bounds.size.w-8, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
-
-  uint8_t cell = bounds.size.w / 5;
-  uint8_t marg = (cell - EMOJI_WIDTH)/2+1;
+  
+  #ifdef PBL_ROUND
+  uint8_t name_width=graphics_text_layout_get_content_size(jobs[index].Name, FONT_GOTHIC_24_BOLD, GRect(4+ROUND_MARGIN, -4, bounds.size.w-8-16-2*ROUND_MARGIN, 4+18), GTextOverflowModeFill, GTextAlignmentLeft).w;
+  uint8_t num_width =graphics_text_layout_get_content_size(jobs_get_job_count_as_text(index), FONT_GOTHIC_18, GRect(4+ROUND_MARGIN, 2, bounds.size.w-8-2*ROUND_MARGIN, 14), GTextOverflowModeFill, GTextAlignmentRight).w;
+  uint8_t total_width=name_width+num_width+12;
+  graphics_draw_text(ctx, jobs[index].Name, FONT_GOTHIC_24_BOLD, GRect((bounds.size.w-total_width)/2, -4, name_width, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  graphics_draw_text(ctx, jobs_get_job_count_as_text(index), FONT_GOTHIC_18, GRect((bounds.size.w-total_width)/2, 0, total_width, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
+  #else
+  graphics_draw_text(ctx, jobs[index].Name, FONT_GOTHIC_24_BOLD, GRect(4+ROUND_MARGIN, -4, bounds.size.w-8-16-2*ROUND_MARGIN, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  graphics_draw_text(ctx, jobs_get_job_count_as_text(index), FONT_GOTHIC_18, GRect(4+ROUND_MARGIN, 0, bounds.size.w-8-2*ROUND_MARGIN, 14), GTextOverflowModeFill, GTextAlignmentRight, NULL);
+  #endif
+  
   char* stickers=jobs[index].Stickers; // always returns a zero padded string
   if (*stickers) {
-    while (*(stickers+5)) stickers+=5;
+    while (*(stickers+EMOJI_CHILD_COLS)) stickers+=EMOJI_CHILD_COLS;
+    #ifdef PBL_ROUND
+    uint8_t n=0;
+    while (stickers[n]) n++;
+    #endif
+    
+    uint8_t cell = (bounds.size.w-2*ROUND_MARGIN) / EMOJI_CHILD_COLS;
+    uint8_t marg = (cell - EMOJI_WIDTH)/2+1+PBL_IF_ROUND_ELSE(ROUND_MARGIN+(EMOJI_CHILD_COLS-n)*cell/2, 0);
     uint8_t i=0;
     while (*stickers) {
       uint8_t emoji=*stickers-1;
@@ -100,17 +119,22 @@ void menu_cell_draw_job(GContext* ctx, const Layer *cell_layer, const uint8_t in
   }
 }
 
-void menu_cell_draw_other(GContext* ctx, const Layer *cell_layer, const char *title, const char *sub_title, GBitmap ** icon) {
+#define MENU_ICON_SPACE PBL_IF_ROUND_ELSE(0,28)
+
+void menu_cell_draw_other(GContext* ctx, const Layer *cell_layer, const char *title, GBitmap ** icon) {
   GRect bounds = layer_get_frame(cell_layer);
   
   #ifndef PBL_SDK_3
   graphics_context_set_text_color(ctx, GColorBlack);
   #endif
   
-  graphics_draw_text(ctx, title, FONT_GOTHIC_24_BOLD, GRect(28, -4, bounds.size.w-28, 4+18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
-  if (sub_title) graphics_draw_text(ctx, sub_title, FONT_GOTHIC_18, GRect(28, 20, bounds.size.w-28-4, 14), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
-
+  graphics_draw_text(ctx, title, FONT_GOTHIC_24_BOLD, GRect(MENU_ICON_SPACE, -4, bounds.size.w-MENU_ICON_SPACE, 4+18), GTextOverflowModeFill, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
+  #ifdef PBL_ROUND
+  uint8_t text_width=graphics_text_layout_get_content_size(title, FONT_GOTHIC_24_BOLD, GRect(MENU_ICON_SPACE, -4, bounds.size.w-MENU_ICON_SPACE, 4+18), GTextOverflowModeFill, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft)).w;  
+  if (icon) graphics_draw_bitmap_in_rect(ctx, icon[PBL_IF_SDK_3_ELSE(menu_cell_layer_is_highlighted(cell_layer), 0)], GRect((bounds.size.w-text_width)/2-16-6,(bounds.size.h-16)/2, 16, 16));
+  #else
   if (icon) graphics_draw_bitmap_in_rect(ctx, icon[PBL_IF_SDK_3_ELSE(menu_cell_layer_is_highlighted(cell_layer), 0)], GRect(6,(bounds.size.h-16)/2, 16, 16));
+  #endif
 }
 
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
@@ -121,8 +145,8 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 
     default:
       switch (MENU_SECTION_CELL) {
-        case MENU_SETTINGS_ADD: menu_cell_draw_other(ctx, cell_layer, "Add Child", NULL, bitmaps[BITMAP_ADD]); break;
-        case MENU_SETTINGS_CONFIG: menu_cell_draw_other(ctx, cell_layer, check_phone_message ? "Check phone..." : "Config/Donate", NULL , bitmaps[BITMAP_SETTINGS]); break;
+        case MENU_SETTINGS_ADD: menu_cell_draw_other(ctx, cell_layer, "Add Child", bitmaps[BITMAP_ADD]); break;
+        case MENU_SETTINGS_CONFIG: menu_cell_draw_other(ctx, cell_layer, check_phone_message ? "Check phone..." : "Config/Donate", bitmaps[BITMAP_SETTINGS]); break;
       }
   }
 }
@@ -177,7 +201,7 @@ void main_menu_show(void) {
   menu_layer_set_callbacks(s_menulayer, NULL, (MenuLayerCallbacks){
     .get_num_sections = menu_get_num_sections_callback,
     .get_num_rows = menu_get_num_rows_callback,
-    .get_header_height = menu_get_header_height_callback,
+    .get_header_height = PBL_IF_ROUND_ELSE(NULL,menu_get_header_height_callback),
     .get_cell_height = menu_get_cell_height_callback,
     .draw_header = menu_draw_header_callback,
     .draw_row = menu_draw_row_callback,

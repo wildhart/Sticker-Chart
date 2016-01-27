@@ -39,9 +39,13 @@
 #define PBL_IF_SDK_3(X)
 #define PBL_IF_SDK_3_ELSE(X, Y)  (Y)
 #define PBL_IF_COLOR_ELSE(X, Y)  (Y)
+#define PBL_IF_ROUND_ELSE(X, Y)  (Y)
 #define PBL_IF_BW_ELSE(X, Y)     (X)
 #define gbitmap_set_bounds(bmp, new_bounds) ((bmp)->bounds = (new_bounds))
+#define GColorLightGray          GColorBlack
+#define GColorDarkGray          GColorBlack
 #endif // PBL_SDK_3
+#define ROUND_MARGIN          PBL_IF_ROUND_ELSE(2,0)
 
 #define ANIMATED true
 #define HIDDEN true
@@ -83,11 +87,11 @@ enum  {
   N_BITMAPS
 };
 
-extern GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
-
 #define MAX_EMOJI_PAGES 5
-#define EMOJI_PAGE_COLS 5
-#define EMOJI_PAGE_ROWS 4
+#define EMOJI_PAGE_COLS 4
+#define EMOJI_PAGE_ROWS 5
+#define EMOJI_CHILD_COLS  5
+#define EMOJI_CHILD_ROWS  4
 #define EMOJI_PAGE_EMOJIS (EMOJI_PAGE_COLS*EMOJI_PAGE_ROWS)
 #define EMOJI_WIDTH 28
 #define EMOJI_HEIGHT 33
@@ -95,8 +99,14 @@ extern GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
 #define EMOJI_PAGE_WIDTH (EMOJI_WIDTH*EMOJI_PAGE_COLS)
 #define EMOJI_PAGE_HEIGHT (EMOJI_HEIGHT*EMOJI_PAGE_ROWS)
 
+extern GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
+#ifdef PBL_ROUND
+#define ROUND_TAB_SIZE 22
+extern GBitmap *round_tabs[MAX_EMOJI_PAGES];
+#endif
+  
 #define MENU_SECTION_CELL  (cell_index->section * 100 + cell_index->row)
-#define MENU_HEIGHT_SINGLE 28
+#define MENU_HEIGHT_SINGLE 24
 #define MENU_HEIGHT_DOUBLE 42
 #define MENU_HEIGHT_JOB    20+EMOJI_HEIGHT+4
 

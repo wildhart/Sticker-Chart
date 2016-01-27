@@ -6,6 +6,10 @@ extern const PebbleProcessInfo __pbl_app_info;
 char app_version[APP_VERSION_LENGTH];
 
 GBitmap *bitmaps[N_BITMAPS][PBL_IF_SDK_3_ELSE(2,1)];
+#ifdef PBL_ROUND
+static GBitmap *round_tabs_bitmap;
+GBitmap *round_tabs[MAX_EMOJI_PAGES];
+#endif
 
 static bool JS_ready = false;
 static bool data_loaded_from_watch = false;
@@ -53,7 +57,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   JS_ready = true;
   Tuple *tuple_t;
   
-  //ERROR("Ignoring phone data!"); return;
+  ERROR("Ignoring phone data!"); return;
 
   bool new_data_from_config_page = dict_find(iter, KEY_CONFIG_DATA);
   tuple_t= dict_find(iter, KEY_TIMESTAMP);
@@ -95,7 +99,7 @@ void main_save_data(const uint32_t timestamp) {
 }
 
 static void main_load_data(void) {
-  ERROR("ignoring saved data"); return;
+  //ERROR("ignoring saved data"); return;
   
   stored_version = persist_read_int(STORAGE_KEY_VERSION); // defaults to 0 if key is missing
   
@@ -108,7 +112,7 @@ static void main_load_data(void) {
       main_save_data(0);
     }
   } else {
-    //ERROR("Loading fake data"); jobs_list_load(STORAGE_KEY_FIRST_CHILD, stored_version);
+    ERROR("Loading fake data"); jobs_list_load(STORAGE_KEY_FIRST_CHILD, stored_version);
   }
 }
 
@@ -141,7 +145,9 @@ GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y, co
     emoji_buffer=gbitmap_create_with_resource(emoji_images[inverted][page]);
     //HEAP("loaded bitmap");
   }
-  gbitmap_set_bounds(emoji_buffer, GRect(EMOJI_WIDTH*x,EMOJI_HEIGHT*y,EMOJI_WIDTH,EMOJI_HEIGHT));
+  // decided to convert the 5x4 image grid to be displayed 4x5 on the screen, so need to swap ROWS and COLS divisors.
+  uint8_t i=y*EMOJI_PAGE_COLS + x;
+  gbitmap_set_bounds(emoji_buffer, GRect(EMOJI_WIDTH*(i%EMOJI_CHILD_COLS),EMOJI_HEIGHT*(i/EMOJI_CHILD_COLS),EMOJI_WIDTH,EMOJI_HEIGHT));
   return emoji_buffer;
 }
 
@@ -164,6 +170,10 @@ void init(void) {
   bitmaps[BITMAP_DELETE][1]  =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_DELETE);
   bitmaps[BITMAP_EDIT][1]    =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_EDIT);
   bitmaps[BITMAP_MINUS][1]   =gbitmap_create_as_sub_bitmap(bitmaps[BITMAP_MATRIX][1], ICON_RECT_MINUS);
+  #endif
+  #ifdef PBL_ROUND
+  round_tabs_bitmap=gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ROUND_TABS);
+  for (uint8_t a=0; a<MAX_EMOJI_PAGES; a++) round_tabs[a]=gbitmap_create_as_sub_bitmap(round_tabs_bitmap, GRect(a*ROUND_TAB_SIZE,0,ROUND_TAB_SIZE,ROUND_TAB_SIZE));
   #endif
   
   main_menu_show();

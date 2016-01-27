@@ -18,7 +18,7 @@ Pebble.addEventListener('ready', function() {
     console.log('Send failed!');
   });
   
-  //server_checkdata();
+  server_checkdata();
   
 });
 
@@ -69,7 +69,7 @@ function server_checkdata() {
     }
   };
   req.send(null);
-  timeout=setTimeout(server_checkdata,10*1000); // 10 seconds
+  timeout=setTimeout(server_checkdata,30*1000); // 30 seconds
 }
 
 function server_send_watch_to_server(username, dict) {
