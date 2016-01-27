@@ -57,7 +57,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   JS_ready = true;
   Tuple *tuple_t;
   
-  ERROR("Ignoring phone data!"); return;
+  //ERROR("Ignoring phone data!"); return;
 
   bool new_data_from_config_page = dict_find(iter, KEY_CONFIG_DATA);
   tuple_t= dict_find(iter, KEY_TIMESTAMP);
