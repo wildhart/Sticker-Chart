@@ -39,7 +39,7 @@ void jobs_list_read_dict(DictionaryIterator *iter, uint8_t first_key, const uint
   }
 }
 
-void jobs_list_load(uint8_t first_key, const uint8_t version) {
+void jobs_list_load2(uint8_t first_key, const uint8_t version) {
   ERROR("Loading fake data");
   LOG("size of job: %d", (int) sizeof(jobs[0]));
   
@@ -47,7 +47,7 @@ void jobs_list_load(uint8_t first_key, const uint8_t version) {
   jobs_list_append_job("Penny",0, NULL);
 }
 
-void jobs_list_load2(uint8_t first_key, const uint8_t version) {
+void jobs_list_load(uint8_t first_key, const uint8_t version) {
   LOG("key=%d, exists=%d", first_key, persist_exists(first_key));
   while (persist_exists(first_key)) {
     struct Job* new_job=&jobs[jobs_count++];
