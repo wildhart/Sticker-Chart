@@ -11,8 +11,11 @@ static TextLayer *s_textlayer_title;
 static TextLayer *s_textlayer_name;
 static TextLayer *s_textlayer_msg;
 
+#define MARGIN PBL_IF_ROUND_ELSE(12,0)
+
 static void initialise_ui(void) {
   s_window = window_create();
+  GRect bounds = layer_get_bounds(window_get_root_layer(s_window));
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
@@ -20,21 +23,25 @@ static void initialise_ui(void) {
   s_res_gothic_28_bold = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
   s_res_roboto_condensed_21 = fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21);
   // s_textlayer_title
-  s_textlayer_title = text_layer_create(GRect(0, 0, 144, 30));
+  s_textlayer_title = text_layer_create(GRect(0, MARGIN, bounds.size.w, 30));
+  text_layer_set_background_color(s_textlayer_title,GColorBlack);
+  text_layer_set_text_color(s_textlayer_title,GColorWhite);
   text_layer_set_text(s_textlayer_title, "Well Done");
   text_layer_set_text_alignment(s_textlayer_title, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_title, s_res_gothic_28_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_title);
   
-  // s_textlayer_name
-  s_textlayer_name = text_layer_create(GRect(0, 30, 144, 30));
+  // s_textlayer_nam
+  s_textlayer_name = text_layer_create(GRect(0, MARGIN+30, bounds.size.w, 38));
+  text_layer_set_background_color(s_textlayer_name,GColorBlack);
+  text_layer_set_text_color(s_textlayer_name,GColorWhite);
   text_layer_set_text(s_textlayer_name, child_name_exclaimed);
   text_layer_set_text_alignment(s_textlayer_name, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_name, s_res_gothic_28_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_name);
   
   // s_textlayer_msg
-  s_textlayer_msg = text_layer_create(GRect(10, 68, 121, 100));
+  s_textlayer_msg = text_layer_create(GRect(10, MARGIN+68, bounds.size.w-20, 100));
   text_layer_set_text(s_textlayer_msg, "Another row is complete!\nYou deserve\na treat !!");
   text_layer_set_text_alignment(s_textlayer_msg, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_msg, s_res_roboto_condensed_21);

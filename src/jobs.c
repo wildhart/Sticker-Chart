@@ -43,7 +43,7 @@ void jobs_list_load2(uint8_t first_key, const uint8_t version) {
   ERROR("Loading fake data");
   LOG("size of job: %d", (int) sizeof(jobs[0]));
   
-  jobs_list_append_job("Millie",20, "\x1\x2\x3\x4\x5\x1\x2\x3\x4\x5\x1\x2\x3\x4\x5\x1\x6\x11\x16\x21");
+  jobs_list_append_job("Millie",4, "\x1\x2\x3\x4");
   jobs_list_append_job("Penny",0, NULL);
 }
 

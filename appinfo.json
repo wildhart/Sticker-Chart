@@ -85,6 +85,7 @@
                 "file": "images/menu_icon.png",
                 "menuIcon": true,
                 "name": "IMAGE_MENU_ICON",
+                "targetPlatforms": null,
                 "type": "png"
             },
             {
