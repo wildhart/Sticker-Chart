@@ -30,7 +30,7 @@ static void graphics_layer_update_callback(Layer *layer, GContext *ctx) {
     // Draw Childs name and # stickers;
     graphics_context_set_text_color(ctx, GColorBlack);
     graphics_context_set_fill_color(ctx,GColorLightGray);
-    graphics_draw_text(ctx, jobs[child_index].Name, FONT_GOTHIC_24_BOLD, GRect(0, 8, bounds.size.w, 8+18), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+    graphics_draw_text(ctx, jobs[child_index].Name, FONT_GOTHIC_24_BOLD, GRect(0, 2, bounds.size.w, 8+18), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
     graphics_draw_text(ctx, jobs_get_job_count_as_text(child_index), FONT_GOTHIC_18, GRect(0, 150, bounds.size.w, 14), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
     
     graphics_context_set_fill_color(ctx,GColorLightGray);

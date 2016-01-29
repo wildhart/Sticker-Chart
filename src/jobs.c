@@ -23,10 +23,8 @@ void jobs_list_save(uint8_t first_key) {
 }
 
 void jobs_list_write_dict(DictionaryIterator *iter, uint8_t first_key) {
-  uint8_t result;
   for (uint8_t a=0; a<jobs_count; a++) {
-    result=dict_write_data(iter, first_key++, (void*) &jobs[a], sizeof(jobs[0]));
-    LOG("job %d, result %d, not enough storate=%d", (int) first_key, (int) result, (int) DICT_NOT_ENOUGH_STORAGE);
+    dict_write_data(iter, first_key++, (void*) &jobs[a], sizeof(jobs[0]));
   }
 }
 
@@ -43,7 +41,7 @@ void jobs_list_load2(uint8_t first_key, const uint8_t version) {
   ERROR("Loading fake data");
   LOG("size of job: %d", (int) sizeof(jobs[0]));
   
-  jobs_list_append_job("Millie",20, "\x1\x2\x3\x4\x5\x1\x2\x3\x4\x5\x1\x2\x3\x4\x5\x1\x6\x11\x16\x21");
+  jobs_list_append_job("Millie",4, "\x1\x2\x3\x4");
   jobs_list_append_job("Penny",0, NULL);
 }
 
