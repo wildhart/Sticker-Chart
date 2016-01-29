@@ -23,10 +23,8 @@ void jobs_list_save(uint8_t first_key) {
 }
 
 void jobs_list_write_dict(DictionaryIterator *iter, uint8_t first_key) {
-  uint8_t result;
   for (uint8_t a=0; a<jobs_count; a++) {
-    result=dict_write_data(iter, first_key++, (void*) &jobs[a], sizeof(jobs[0]));
-    LOG("job %d, result %d, not enough storate=%d", (int) first_key, (int) result, (int) DICT_NOT_ENOUGH_STORAGE);
+    dict_write_data(iter, first_key++, (void*) &jobs[a], sizeof(jobs[0]));
   }
 }
 

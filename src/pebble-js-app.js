@@ -4,23 +4,19 @@ var timeout=null;
 
 Pebble.addEventListener('ready', function() {
   console.log('PebbleKit JS ready!');
+  //localStorage.removeItem("settings"); localStorage.removeItem("username");  console.warn("Overwriting data saved on phone!!!");
   var settings=localStorage.getItem("settings");
-  //settings='{"1":"1.0","2":1,"4":1453695384,"KEY_APP_VERSION":"1.0","KEY_VERSION":1,"KEY_TIMESTAMP":1453695384,"KEY_CHILDREN":[77,105,108,108,105,101,0,0,0,0,0,0,0,0,0,0,2,0,19,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}';
-  var dict=settings ? JSON.parse(settings) : {};
-  if (!dict.KEY_TIMESTAMP) { 
-    var d=new Date();
-    dict.KEY_TIMESTAMP = Math.floor(d.getTime()/1000 - d.getTimezoneOffset()*60);
-    localStorage.setItem("settings",JSON.stringify(dict));
-  }
+  send_dict_to_watch(settings ? JSON.parse(settings) : {});
+  server_checkdata();
+});
+
+function send_dict_to_watch(dict) {
   Pebble.sendAppMessage(dict, function() {
     console.log('Send successful: ' + JSON.stringify(dict));
   }, function() {
     console.log('Send failed!');
   });
-  
-  server_checkdata();
-  
-});
+}
 
 Pebble.addEventListener("appmessage",	function(e) {
 	console.log("Received message: " + JSON.stringify(e.payload));
@@ -94,6 +90,7 @@ function server_send_watch_to_server(username, dict) {
     console.log('AJAX Resonse: ' + req.responseText);
     var ajax=JSON.parse(req.responseText);
     if (!ajax.success) return console.log("server error: "+req.responseText);
+    send_dict_to_watch(dict);
   };
   req.send(null);
 }
@@ -114,9 +111,7 @@ function send_config_to_watch(configData) {
   var dict = {};
   dict.KEY_CONFIG_DATA  = 1;
   dict.KEY_VERSION = configData.data_version;
-  var d=new Date();
-  console.log("timestamp="+configData.timestamp+", time()="+Math.floor(d.getTime()/1000 /*- d.getTimezoneOffset()*60*/));
-  dict.KEY_TIMESTAMP = (configData.timestamp) ? configData.timestamp*1.0 : Math.floor(d.getTime()/1000 /*- d.getTimezoneOffset()*60*/);
+  dict.KEY_TIMESTAMP = configData.timestamp*1.0;
   var children=configData.children;
   var child=0;
   while (children[child]) {
@@ -127,14 +122,12 @@ function send_config_to_watch(configData) {
   
   if (configData.username) {
     localStorage.setItem("username",JSON.stringify({username: configData.username, password: configData.password}));
+  } else {
+    localStorage.removeItem("username");
   }
 
   // Send to watchapp
-  Pebble.sendAppMessage(dict, function() {
-    console.log('Send successful: ' + JSON.stringify(dict));
-  }, function() {
-    console.log('Send failed!');
-  });
+  send_dict_to_watch(dict);
 }
 
 Pebble.addEventListener('showConfiguration', showConfiguration);

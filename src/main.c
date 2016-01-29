@@ -36,7 +36,7 @@ static void send_settings_to_phone() {
   
   dict_write_cstring(iter, KEY_APP_VERSION, app_version);
   dummy_int=CURRENT_STORAGE_VERSION;   dict_write_int(iter, KEY_VERSION, &dummy_int, sizeof(int), true);
-  dummy_int=data_timestamp;          dict_write_int(iter, KEY_TIMESTAMP, &dummy_int, sizeof(int), true);
+  dummy_int=data_timestamp;            dict_write_int(iter, KEY_TIMESTAMP, &dummy_int, sizeof(int), true);
 
   if (export_after_save) {
     dummy_int=true;
@@ -47,7 +47,7 @@ static void send_settings_to_phone() {
   jobs_list_write_dict(iter, KEY_CHILDREN);
 
   dict_write_end(iter);
-  LOG("ended, dict_size=%d", (int) dict_size(iter));
+  //LOG("ended, dict_size=%d", (int) dict_size(iter));
   app_message_outbox_send();
 }
 
@@ -105,14 +105,14 @@ static void main_load_data(void) {
   
   if (stored_version) {
     data_loaded_from_watch = true;
-    if (persist_exists(STORAGE_KEY_TIMESTAMP)) data_timestamp=persist_read_int(STORAGE_KEY_TIMESTAMP);
+    data_timestamp=persist_read_int(STORAGE_KEY_TIMESTAMP);
     jobs_list_load(STORAGE_KEY_FIRST_CHILD, stored_version);
     if (stored_version < CURRENT_STORAGE_VERSION)  {
       LOG("Saving data in new version");
       main_save_data(0);
     }
   } else {
-    ERROR("Loading fake data"); jobs_list_load(STORAGE_KEY_FIRST_CHILD, stored_version);
+    //ERROR("Loading fake data"); jobs_list_load(STORAGE_KEY_FIRST_CHILD, stored_version);
   }
 }
 
