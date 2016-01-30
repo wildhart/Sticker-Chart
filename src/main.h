@@ -112,7 +112,7 @@ extern GBitmap *round_tabs[MAX_EMOJI_PAGES];
 
 // Persistent Storage Keys
 #define STORAGE_KEY_VERSION      1
-#define STORAGE_KEY_TIMESTAMP    1
+#define STORAGE_KEY_TIMESTAMP    2
 #define STORAGE_KEY_FIRST_CHILD  100
 
 #define CURRENT_STORAGE_VERSION 1
