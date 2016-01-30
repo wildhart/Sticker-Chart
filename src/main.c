@@ -95,6 +95,7 @@ void main_save_data(const uint32_t timestamp) {
   if (timestamp!=1) data_timestamp=timestamp ?  timestamp : (uint32_t) time(NULL);
   persist_write_int(STORAGE_KEY_TIMESTAMP, data_timestamp);
   jobs_list_save(STORAGE_KEY_FIRST_CHILD);
+  LOG("saved version=%d, timestamp=%ld", CURRENT_STORAGE_VERSION, data_timestamp);
   send_settings_to_phone();
 }
 
@@ -111,6 +112,7 @@ static void main_load_data(void) {
       LOG("Saving data in new version");
       main_save_data(0);
     }
+    LOG("loaded version=%d, timestamp=%ld", stored_version, data_timestamp);
   } else {
     //ERROR("Loading fake data"); jobs_list_load(STORAGE_KEY_FIRST_CHILD, stored_version);
   }
@@ -152,8 +154,8 @@ GBitmap* main_get_emoji(const uint8_t page, const uint8_t x, const uint8_t y, co
 }
 
 void init(void) {
-  snprintf(app_version,APP_VERSION_LENGTH,"%d.%d",__pbl_app_info.process_version.major, __pbl_app_info.process_version.minor);
-  
+  snprintf(app_version,APP_VERSION_LENGTH,"%d.%02d",__pbl_app_info.process_version.major, __pbl_app_info.process_version.minor);
+  LOG("app_version=%s",app_version);
   main_load_data();
   
   bitmaps[BITMAP_MATRIX][0]  =gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ICON_MATRIX);

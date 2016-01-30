@@ -18,6 +18,7 @@ static void jobs_list_append_job(const char* name, uint16_t count, char* sticker
 
 void jobs_list_save(uint8_t first_key) {
   for (uint8_t a=0; a<jobs_count; a++) persist_write_data(first_key++, &jobs[a], sizeof(jobs[0]));
+  LOG("saved jobs %d",first_key);
   // if we've delete a job then need to delete the saved version or it will come back!
   persist_delete(first_key);
 }
